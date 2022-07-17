@@ -16,7 +16,6 @@ public class Window {
 	private String title; 
 	
 	public float r, g, b , a;
-	private boolean fadeOut;
 	
 	private static Scene currentScene;
 	
@@ -31,7 +30,6 @@ public class Window {
 		b = 1;
 		a = 1;
 		
-		fadeOut = false;
 	};
 	
 	public static void changeScene(int newScene) {
@@ -39,11 +37,13 @@ public class Window {
 		case 0:
 			currentScene = new LevelEditorScene();
 			currentScene.init();
+			currentScene.start();
 			break;
 		
 		case 1:
 			currentScene = new LevelScene();
 			currentScene.init();
+			currentScene.start();
 			break;
 		default:
 			assert false : "Unknown scene '" + newScene + "'";
@@ -56,6 +56,11 @@ public class Window {
 		}
 		
 		return instance;
+	}
+	
+	
+	public static Scene getScene() {
+		return get().currentScene;
 	}
 	
 	public void run() {
@@ -97,7 +102,7 @@ public class Window {
 	}
 	
 	private void loop() {
-		float beginTime = Time.getTime();
+		float beginTime = (float)glfwGetTime();
 		float endTime;
 		
 		float dt = -1.0f;
@@ -117,7 +122,7 @@ public class Window {
 			
 			glfwSwapBuffers(windowID);
 			
-			endTime = Time.getTime();
+			endTime = (float)glfwGetTime();
 			dt = endTime - beginTime;
 			beginTime = endTime;
 			
