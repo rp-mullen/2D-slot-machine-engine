@@ -11,6 +11,7 @@ public class Window {
 	
 	private static Window instance = null;
 	private long windowID; 
+	private ImGuiLayer imGuiLayer;
 	
 	private int width, height;
 	private String title; 
@@ -89,17 +90,28 @@ public class Window {
 		glfwSetMouseButtonCallback(windowID,MouseListener::mouseButtonCallback);
 		glfwSetScrollCallback(windowID,MouseListener::mouseScrollCallback);
 		glfwSetKeyCallback(windowID,KeyListener::keyCallback);
+		glfwSetWindowSizeCallback(windowID, (w, newWidth, newHeight) -> {
+			Window.setWidth(newWidth);
+			Window.setHeight(newHeight);
+		});
 		
 		glfwMakeContextCurrent(windowID);
 		
 		// enable v-sync
 		glfwSwapInterval(1);
+		glfwShowWindow(windowID);
+		
 		
 		GL.createCapabilities();
 		
+		this.imGuiLayer = new ImGuiLayer(windowID);
+		this.imGuiLayer.initImGui();
+		
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+		
 		Window.changeScene(0);
-		glfwShowWindow(windowID);
-	}
+		}
 	
 	private void loop() {
 		float beginTime = (float)glfwGetTime();
@@ -119,6 +131,7 @@ public class Window {
 				currentScene.update(dt);
 			}
 			
+			this.imGuiLayer.update(dt);
 			
 			glfwSwapBuffers(windowID);
 			
@@ -129,4 +142,19 @@ public class Window {
 		}
 	}
 	
+	public static int getWidth() {
+		return get().width;
+	}
+	
+	public static int getHeight() {
+		return get().height;
+	}
+	
+	public static void setWidth(int newWidth) {
+		get().width = newWidth;
+	}
+	
+	public static void setHeight(int newHeight) {
+		get().height = newHeight;
+	}
 }
