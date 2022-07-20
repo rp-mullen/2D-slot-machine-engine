@@ -116,10 +116,10 @@ public class Window {
 	private void loop() {
 		float beginTime = (float)glfwGetTime();
 		float endTime;
-		
 		float dt = -1.0f;
+		
+		currentScene.load();
 		while (!glfwWindowShouldClose(windowID)) {
-			
 			
 			glfwPollEvents();
 			
@@ -127,12 +127,10 @@ public class Window {
 			glClear(GL_COLOR_BUFFER_BIT);
 			
 			if (dt >= 0) {
-				// does events in update -> fade out
 				currentScene.update(dt);
 			}
 			
-			this.imGuiLayer.update(dt);
-			
+			this.imGuiLayer.update(dt, currentScene);
 			glfwSwapBuffers(windowID);
 			
 			endTime = (float)glfwGetTime();
@@ -140,6 +138,7 @@ public class Window {
 			beginTime = endTime;
 			
 		}
+		currentScene.saveExit();
 	}
 	
 	public static int getWidth() {

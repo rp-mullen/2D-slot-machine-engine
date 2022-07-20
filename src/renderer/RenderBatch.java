@@ -113,7 +113,6 @@ public class RenderBatch implements Comparable<RenderBatch> {
 		for (int i = 0; i < numSprites; i++) {
 			SpriteRenderer spr = sprites[i];
 			if (spr.isDirty()) {
-				System.out.println("is dirty");
 				loadVertexProperties(i);
 				spr.setClean();
 				rebufferData = true;
