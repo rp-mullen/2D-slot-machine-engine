@@ -5,6 +5,10 @@ import static org.lwjgl.opengl.GL40.*;
 
 import org.lwjgl.opengl.GL;
 
+import renderer.DebugDraw;
+import scenes.LevelEditorScene;
+import scenes.LevelScene;
+import scenes.Scene;
 import util.Time;
 
 public class Window {
@@ -22,8 +26,8 @@ public class Window {
 	
 	// note: singleton pattern!
 	private Window() {
-		this.width = 800;
-		this.height = 600;
+		this.width = (int)(1440*1.3);
+		this.height = (int)(800*1.3);
 		this.title = "Window";
 		
 		r= 1;
@@ -37,6 +41,7 @@ public class Window {
 		switch (newScene) {
 		case 0:
 			currentScene = new LevelEditorScene();
+			currentScene.load();
 			currentScene.init();
 			currentScene.start();
 			break;
@@ -118,15 +123,18 @@ public class Window {
 		float endTime;
 		float dt = -1.0f;
 		
-		currentScene.load();
+		
 		while (!glfwWindowShouldClose(windowID)) {
 			
 			glfwPollEvents();
+			
+			DebugDraw.beginFrame();
 			
 			glClearColor(r,g,b,a);
 			glClear(GL_COLOR_BUFFER_BIT);
 			
 			if (dt >= 0) {
+				DebugDraw.draw();
 				currentScene.update(dt);
 			}
 			
