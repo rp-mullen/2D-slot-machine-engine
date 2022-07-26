@@ -6,6 +6,7 @@ import static org.lwjgl.opengl.GL40.*;
 import org.lwjgl.opengl.GL;
 
 import renderer.DebugDraw;
+import renderer.Framebuffer;
 import scenes.LevelEditorScene;
 import scenes.LevelScene;
 import scenes.Scene;
@@ -19,6 +20,8 @@ public class Window {
 	
 	private int width, height;
 	private String title; 
+	
+	private Framebuffer framebuffer;
 	
 	public float r, g, b , a;
 	
@@ -115,6 +118,8 @@ public class Window {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 		
+		this.framebuffer = new Framebuffer(2240, 1400);
+		
 		Window.changeScene(0);
 		}
 	
@@ -133,10 +138,12 @@ public class Window {
 			glClearColor(r,g,b,a);
 			glClear(GL_COLOR_BUFFER_BIT);
 			
+			//this.framebuffer.bind();
 			if (dt >= 0) {
 				DebugDraw.draw();
 				currentScene.update(dt);
 			}
+			this.framebuffer.unbind();
 			
 			this.imGuiLayer.update(dt, currentScene);
 			glfwSwapBuffers(windowID);
