@@ -7,9 +7,13 @@ import org.lwjgl.opengl.GL;
 
 import renderer.DebugDraw;
 import renderer.Framebuffer;
+import renderer.PickingTexture;
+import renderer.Renderer;
+import renderer.Shader;
 import scenes.LevelEditorScene;
 import scenes.LevelScene;
 import scenes.Scene;
+import util.AssetPool;
 import util.Settings;
 import util.Time;
 
@@ -23,6 +27,8 @@ public class Window {
 	private String title; 
 	
 	private Framebuffer framebuffer;
+	private PickingTexture pickingTexture;
+	
 	
 	public float r, g, b , a;
 	
@@ -119,45 +125,70 @@ public class Window {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 		
-		this.framebuffer = new Framebuffer(2240, 1400);
-		glViewport(0,0,2240,1400);
+		this.framebuffer = new Framebuffer(Settings.SCREEN_NATIVE_RESOLUTION_X, Settings.SCREEN_NATIVE_RESOLUTION_Y);
+		this.pickingTexture = new PickingTexture(Settings.SCREEN_NATIVE_RESOLUTION_X,Settings.SCREEN_NATIVE_RESOLUTION_Y);
+		glViewport(0,0,Settings.SCREEN_NATIVE_RESOLUTION_X,Settings.SCREEN_NATIVE_RESOLUTION_Y);
 		
 		Window.changeScene(0);
 		}
 	
 	private void loop() {
 		float beginTime = (float)glfwGetTime();
-		float endTime;
-		float dt = -1.0f;
-		
-		
-		while (!glfwWindowShouldClose(windowID)) {
-			
-			glfwPollEvents();
-			
-			DebugDraw.beginFrame();
-			
-			this.framebuffer.bind();
-			
-			glClearColor(r,g,b,a);
-			glClear(GL_COLOR_BUFFER_BIT);
-			
-			
-			if (dt >= 0) {
-				DebugDraw.draw();
-				currentScene.update(dt);
-			}
-			this.framebuffer.unbind();
-			
-			this.imGuiLayer.update(dt, currentScene);
-			glfwSwapBuffers(windowID);
-			
-			endTime = (float)glfwGetTime();
-			dt = endTime - beginTime;
-			beginTime = endTime;
-			
-		}
-		currentScene.saveExit();
+        float endTime;
+        float dt = -1.0f;
+
+        Shader defaultShader = AssetPool.getShader("assets/shaders/default.glsl");
+        Shader pickingShader = AssetPool.getShader("assets/shaders/pickingShader.glsl");
+
+        while (!glfwWindowShouldClose(windowID)) {
+            // Poll events
+            glfwPollEvents();
+
+            // Render pass 1. Render to picking texture
+            glDisable(GL_BLEND);
+            pickingTexture.enableWriting();
+
+            glViewport(0, 0, Settings.SCREEN_NATIVE_RESOLUTION_X, Settings.SCREEN_NATIVE_RESOLUTION_Y);
+            
+            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            Renderer.bindShader(pickingShader);
+            currentScene.render();
+
+            if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
+                int x = (int)MouseListener.getScreenX();
+                int y = (int)MouseListener.getScreenY();
+                System.out.println(pickingTexture.readPixel(x, y));
+            }
+
+            pickingTexture.disableWriting();
+            glEnable(GL_BLEND);
+
+            // Render pass 2. Render actual game
+            DebugDraw.beginFrame();
+
+            this.framebuffer.bind();
+            glClearColor(r, g, b, a);
+            glClear(GL_COLOR_BUFFER_BIT);
+
+            if (dt >= 0) {
+                DebugDraw.draw();
+                Renderer.bindShader(defaultShader);
+                currentScene.update(dt);
+                currentScene.render();
+            }
+            this.framebuffer.unbind();
+
+            this.imGuiLayer.update(dt, currentScene);
+            glfwSwapBuffers(windowID);
+
+            endTime = (float)glfwGetTime();
+            dt = endTime - beginTime;
+            beginTime = endTime;
+        }
+
+        currentScene.saveExit();
 	}
 	
 	public static int getWidth() {

@@ -37,6 +37,8 @@ public class LevelEditorScene extends Scene {
 
     }
 
+    
+    
     @Override
     public void init() {
         
@@ -99,6 +101,7 @@ public class LevelEditorScene extends Scene {
     
     float t = 0.0f;
     float angle = 0.0f;
+    
     @Override
     public void update(float dt) {
     	levelEditorStuff.update(dt);
@@ -121,9 +124,15 @@ public class LevelEditorScene extends Scene {
             go.update(dt);
         }
 
-        this.renderer.render();
+        
     }
 
+    
+    @Override
+    public void render() {
+    	this.renderer.render();
+    }
+    
     @Override
     public void imgui() {
         ImGui.begin("Test window");

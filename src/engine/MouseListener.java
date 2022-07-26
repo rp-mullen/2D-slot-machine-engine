@@ -4,6 +4,8 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 
+import util.Settings;
+
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 
@@ -104,12 +106,12 @@ public class MouseListener {
         }
     }
     
-    public void setGameViewportPos(Vector2f gameViewportPos) {
-    	this.gameViewportPos.set(gameViewportPos);
+    public static void setGameViewportPos(Vector2f gameViewportPos) {
+    	get().gameViewportPos.set(gameViewportPos);
     }
     
-    public void setGameViewportSize(Vector2f gameViewportSize) {
-    	this.gameViewportSize.set(gameViewportSize);
+    public static void setGameViewportSize(Vector2f gameViewportSize) {
+    	get().gameViewportSize.set(gameViewportSize);
     }
     
     
@@ -118,20 +120,42 @@ public class MouseListener {
         currentX = (currentX / get().gameViewportSize.x) * 2.0f - 1.0f;
         Vector4f tmp = new Vector4f(currentX, 0, 0, 1);
         Matrix4f viewProjection = new Matrix4f();
-        Window.getScene().camera().getInverseView().mul(Window.getScene().camera().getInverseProjection()), viewProjection);
-        tmp.mul(Window.getScene().camera().getInverseProjection()).mul(Window.getScene().camera().getInverseView());
+        
+        Camera camera = Window.getScene().camera();
+        camera.getInverseView().mul(camera.getInverseProjection(), viewProjection);
+        
+        tmp.mul(viewProjection);
         currentX = tmp.x;
 
         return currentX;
     }
 
+    public static float getScreenX() {
+    	float currentX = getX() - get().gameViewportPos.x;
+        currentX = (currentX / get().gameViewportSize.x) * Settings.SCREEN_NATIVE_RESOLUTION_X;
+        
+        return currentX;
+    }
+    
     public static float getOrthoY() {
         float currentY = getY() - get().gameViewportPos.y;
-        currentY = (currentY / get().gameViewportSize.y) * 2.0f - 1.0f;
+        currentY = -((currentY / get().gameViewportSize.y) * 2.0f - 1.0f);
         Vector4f tmp = new Vector4f(0, currentY, 0, 1);
-        tmp.mul(Window.getScene().camera().getInverseProjection()).mul(Window.getScene().camera().getInverseView());
+        Matrix4f viewProjection = new Matrix4f();
+        
+        Camera camera = Window.getScene().camera();
+        camera.getInverseView().mul(camera.getInverseProjection(), viewProjection);
+        
+        tmp.mul(viewProjection);
         currentY = tmp.y;
 
+        return currentY;
+    }
+    
+    public static float getScreenY() {
+    	float currentY = getY() - get().gameViewportPos.y;
+        currentY = Settings.SCREEN_NATIVE_RESOLUTION_Y - ((currentY / get().gameViewportSize.y) * Settings.SCREEN_NATIVE_RESOLUTION_Y);
+        
         return currentY;
     }
 }
