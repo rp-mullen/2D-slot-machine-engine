@@ -10,6 +10,7 @@ import renderer.Framebuffer;
 import scenes.LevelEditorScene;
 import scenes.LevelScene;
 import scenes.Scene;
+import util.Settings;
 import util.Time;
 
 public class Window {
@@ -29,8 +30,8 @@ public class Window {
 	
 	// note: singleton pattern!
 	private Window() {
-		this.width = (int)(1440*1.3);
-		this.height = (int)(800*1.3);
+		this.width = Settings.SCREEN_NATIVE_RESOLUTION_X;
+		this.height = Settings.SCREEN_NATIVE_RESOLUTION_Y;
 		this.title = "Window";
 		
 		r= 1;
@@ -119,6 +120,7 @@ public class Window {
 		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 		
 		this.framebuffer = new Framebuffer(2240, 1400);
+		glViewport(0,0,2240,1400);
 		
 		Window.changeScene(0);
 		}
@@ -135,10 +137,12 @@ public class Window {
 			
 			DebugDraw.beginFrame();
 			
+			this.framebuffer.bind();
+			
 			glClearColor(r,g,b,a);
 			glClear(GL_COLOR_BUFFER_BIT);
 			
-			//this.framebuffer.bind();
+			
 			if (dt >= 0) {
 				DebugDraw.draw();
 				currentScene.update(dt);
@@ -170,5 +174,13 @@ public class Window {
 	
 	public static void setHeight(int newHeight) {
 		get().height = newHeight;
+	}
+	
+	public static Framebuffer getFramebuffer() {
+		return get().framebuffer;
+	}
+	
+	public static float getTargetAspectRatio() {
+		return 16.0f / 10.0f;
 	}
 }

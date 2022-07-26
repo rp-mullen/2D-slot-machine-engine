@@ -18,6 +18,9 @@ import imgui.type.ImBoolean;
 import scenes.Scene;
 
 import static org.lwjgl.opengl.GL33.*;
+
+import editor.GameViewWindow;
+
 import static org.lwjgl.glfw.GLFW.*;
 
 public class ImGuiLayer {
@@ -211,6 +214,7 @@ public class ImGuiLayer {
 		setupDockspace();
 		currentScene.sceneImgui();
 		ImGui.showDemoWindow();
+		GameViewWindow.imgui();
 		ImGui.end();
 		ImGui.render();
 		
