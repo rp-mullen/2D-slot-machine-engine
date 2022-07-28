@@ -119,8 +119,6 @@ public class Window {
 		
 		GL.createCapabilities();
 		
-		this.imGuiLayer = new ImGuiLayer(windowID);
-		this.imGuiLayer.initImGui();
 		
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -128,6 +126,10 @@ public class Window {
 		this.framebuffer = new Framebuffer(Settings.SCREEN_NATIVE_RESOLUTION_X, Settings.SCREEN_NATIVE_RESOLUTION_Y);
 		this.pickingTexture = new PickingTexture(Settings.SCREEN_NATIVE_RESOLUTION_X,Settings.SCREEN_NATIVE_RESOLUTION_Y);
 		glViewport(0,0,Settings.SCREEN_NATIVE_RESOLUTION_X,Settings.SCREEN_NATIVE_RESOLUTION_Y);
+		
+		this.imGuiLayer = new ImGuiLayer(windowID,pickingTexture);
+		this.imGuiLayer.initImGui();
+		
 		
 		Window.changeScene(0);
 		}
@@ -156,11 +158,6 @@ public class Window {
             Renderer.bindShader(pickingShader);
             currentScene.render();
 
-            if (MouseListener.mouseButtonDown(GLFW_MOUSE_BUTTON_LEFT)) {
-                int x = (int)MouseListener.getScreenX();
-                int y = (int)MouseListener.getScreenY();
-                System.out.println(pickingTexture.readPixel(x, y));
-            }
 
             pickingTexture.disableWriting();
             glEnable(GL_BLEND);
@@ -182,7 +179,8 @@ public class Window {
 
             this.imGuiLayer.update(dt, currentScene);
             glfwSwapBuffers(windowID);
-
+            MouseListener.endFrame();
+            
             endTime = (float)glfwGetTime();
             dt = endTime - beginTime;
             beginTime = endTime;
@@ -213,5 +211,9 @@ public class Window {
 	
 	public static float getTargetAspectRatio() {
 		return 16.0f / 10.0f;
+	}
+	
+	public static ImGuiLayer getImguiLayer() {
+		return get().imGuiLayer;
 	}
 }

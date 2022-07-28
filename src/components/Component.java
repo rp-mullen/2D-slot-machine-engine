@@ -2,8 +2,12 @@ package components;
 
 import imgui.ImGui;
 import engine.GameObject;
+
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+
+import editor.JImGui;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -48,15 +52,17 @@ public abstract class Component {
                     }
                 } else if (type == float.class) {
                     float val = (float)value;
-                    float[] imFloat = {val};
-                    if (ImGui.dragFloat(name + ": ", imFloat)) {
-                        field.set(this, imFloat[0]);
-                    }
+                    JImGui.dragFloat(name, val);
+                    
                 } else if (type == boolean.class) {
                     boolean val = (boolean)value;
                     if (ImGui.checkbox(name + ": ", val)) {
                         field.set(this, !val);
                     }
+                } else if (type == Vector2f.class && value != null) {
+                	
+                    Vector2f val = (Vector2f)value;
+                    JImGui.drawVec2Control(name,val);
                 } else if (type == Vector3f.class) {
                     Vector3f val = (Vector3f)value;
                     float[] imVec = {val.x, val.y, val.z};

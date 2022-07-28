@@ -86,7 +86,7 @@ public class SpriteRenderer extends Component{
 		}
 	}
 	
-	public void setTexure(Texture texture) {
+	public void setTexture(Texture texture) {
 		this.sprite.setTexture(texture);
 	}
 }

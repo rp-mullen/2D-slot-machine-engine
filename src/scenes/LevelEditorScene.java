@@ -3,17 +3,22 @@ package scenes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import components.EditorCamera;
+import components.GizmoSystem;
 import components.GridLines;
 import components.MouseControls;
 import components.RigidBody;
+import components.ScaleGizmo;
 import components.Sprite;
 import components.SpriteRenderer;
 import components.Spritesheet;
+import components.TranslateGizmo;
 import engine.Camera;
 import engine.GameObject;
 import engine.MouseListener;
 import engine.Prefabs;
 import engine.Transform;
+import engine.Window;
 import imgui.ImGui;
 import imgui.ImVec2;
 import renderer.DebugDraw;
@@ -31,7 +36,7 @@ public class LevelEditorScene extends Scene {
     private Spritesheet sprites;
     SpriteRenderer obj1Sprite;
     
-    GameObject levelEditorStuff = new GameObject("LevelEditor", new Transform(new Vector2f()), 0);
+    GameObject levelEditorStuff = this.createGameObject("LevelEditor");
     
     public LevelEditorScene() {
 
@@ -41,60 +46,42 @@ public class LevelEditorScene extends Scene {
     
     @Override
     public void init() {
-        
-    	levelEditorStuff.addComponent(new MouseControls());
-    	levelEditorStuff.addComponent(new GridLines());
     	
     	loadResources();
-        this.camera = new Camera(new Vector2f(-250, 0));
-        sprites = AssetPool.getSpritesheet("assets/images/spritesheets/decorationsAndBlocks.png");
-        
-        if (levelLoaded) {
-            if (gameObjects.size() > 0) {
-            	this.activeGameObject = gameObjects.get(0);
-            	}
-            return; 
-        }
-
-
-//        obj1 = new GameObject("Object 1", new Transform(new Vector2f(200, 100),
-//                new Vector2f(256, 256)), 2);
-//        obj1Sprite = new SpriteRenderer();
-//        obj1Sprite.setColor(new Vector4f(1, 0, 0, 1));
-//        obj1.addComponent(obj1Sprite);
-//        obj1.addComponent(new RigidBody());
-//        this.addGameObjectToScene(obj1);
-//        this.activeGameObject = obj1;
-//
-//        GameObject obj2 = new GameObject("Object 2",
-//                new Transform(new Vector2f(400, 100), new Vector2f(256, 256)), 3);
-//        SpriteRenderer obj2SpriteRenderer = new SpriteRenderer();
-//        Sprite obj2Sprite = new Sprite();
-//        obj2Sprite.setTexture(AssetPool.getTexture("assets/images/blendImage2.png"));
-//        obj2SpriteRenderer.setSprite(obj2Sprite);
-//        obj2.addComponent(obj2SpriteRenderer);
-//        this.addGameObjectToScene(obj2);
-//        
-        }
+    	sprites = AssetPool.getSpritesheet("assets/images/spritesheets/decorationsAndBlocks.png");
+    	Spritesheet gizmos = AssetPool.getSpritesheet("assets/images/spritesheets/gizmos.png");
+    	
+    	this.camera = new Camera(new Vector2f(-250, 0));
+    	levelEditorStuff.addComponent(new MouseControls());
+    	levelEditorStuff.addComponent(new GridLines());
+    	levelEditorStuff.addComponent(new EditorCamera(this.camera));
+    	
+    	levelEditorStuff.addComponent(new GizmoSystem(gizmos));
+    	
+    	levelEditorStuff.start();
+    }
 
     private void loadResources() {
         AssetPool.getShader("assets/shaders/default.glsl");
 
-        // TODO: FIX TEXTURE SAVE SYSTEM TO USE PATH INSTEAD OF ID
         AssetPool.addSpritesheet("assets/images/spritesheets/decorationsAndBlocks.png",
                 new Spritesheet(AssetPool.getTexture("assets/images/spritesheets/decorationsAndBlocks.png"),
                         16, 16, 81, 0));
+        AssetPool.addSpritesheet("assets/images/spritesheets/gizmos.png",
+                new Spritesheet(AssetPool.getTexture("assets/images/spritesheets/gizmos.png"),
+                        24, 48, 3, 0));
         AssetPool.getTexture("assets/images/blendImage2.png");
-        
-        for (GameObject go : gameObjects) {
-        	if (go.getComponent(SpriteRenderer.class) != null) {
-        		SpriteRenderer spr = go.getComponent(SpriteRenderer.class);
-        		if (spr.getTexture() != null) {
-        			spr.setTexure(AssetPool.getTexture(spr.getTexture().getFilepath()));
-        		}
-        	}
+
+        for (GameObject g : gameObjects) {
+            if (g.getComponent(SpriteRenderer.class) != null) {
+                SpriteRenderer spr = g.getComponent(SpriteRenderer.class);
+                if (spr.getTexture() != null) {
+                    spr.setTexture(AssetPool.getTexture(spr.getTexture().getFilepath()));
+                }
+            }
         }
     }
+
     
     float x = 0.0f;
     float y = 0.0f;
@@ -105,6 +92,7 @@ public class LevelEditorScene extends Scene {
     @Override
     public void update(float dt) {
     	levelEditorStuff.update(dt);
+    	this.camera.adjustProjection();
     	
     	DebugDraw.addCircle2D(new Vector2f(x,y), 64, new Vector3f(0,1,0), 1);
     	x += 50 * dt;
@@ -135,6 +123,10 @@ public class LevelEditorScene extends Scene {
     
     @Override
     public void imgui() {
+    	ImGui.begin("Level editor stuff");
+    	levelEditorStuff.imgui();
+    	ImGui.end();
+    	
         ImGui.begin("Test window");
 
         ImVec2 windowPos = new ImVec2();
