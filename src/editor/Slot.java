@@ -39,46 +39,49 @@ public class Slot extends Component{
 	
 	private boolean outOfBounds = false;
 	private boolean slotRunning = true;
-	private boolean aligned = false;
 	
 	private boolean done = false;
 	
-	private List<GameObject> fruits;
+	private int slotNum;
 	
-	private int winningObject;
+	private transient List<GameObject> fruits;
 	
-	private transient GameObject testObj;
+	private int winningObjectID;
+	
+	private Spritesheet sprites;
+	
 	public Slot(Spritesheet sprites, int n) {
 		
 		fruits = new ArrayList<>();
+		this.sprites = sprites;
+		this.slotNum = n;
 		
-		this.t += n*Math.random() + n;
+		init();
 		
-		this.offsetX = n * slotDistance;
+	}
+	
+	public void init() {
+		this.finalTime += slotNum*Math.random() + slotNum;
 		
-		System.out.println("sprites size: " + sprites.size());
+		this.offsetX = slotNum * slotDistance;
+		
 		
 		for (int i = 0; i < sprites.size(); i++) {
-			GameObject obj = Prefabs.generateSpriteObject(sprites.getSprite(i), 100, 100);
+			GameObject obj = Prefabs.generateSpriteObject(this.sprites.getSprite(i), 100, 100);
 		
 			obj.transform.position.x = slotX + offsetX + paddingX;
 			obj.transform.position.y = slotBottomY + paddingY + fruitDistY*i;
-		
+			obj.setNoSerialize();
 			obj.transform.zIndex = 50;
 		
+			if (obj.transform.position.y >= slotTopY && obj.transform.position.y < maxY) {
+				obj.getComponent(SpriteRenderer.class).setColor(new Vector4f(0,0,0,0));
+			}
+			
 			this.fruits.add(obj);
 			
 			Window.getScene().addGameObjectToScene(obj);
 		}
-		
-		
-		
-		//this.width = 1334.0f;
-		//this.height = 786.0f;
-				
-	
-		
-		//Window.getScene().addGameObjectToScene(slotObject);
 	}
 	
 	@Override
@@ -87,20 +90,44 @@ public class Slot extends Component{
 			t += dt;
 			for (int i = 0; i < fruits.size(); i++) {
 				
-				//System.out.println("time: " + t);
-				
 				GameObject obj = fruits.get(i);
-				obj.transform.position.y += 1000*dt;
+				obj.transform.position.y += 900*dt;
 			
 				if (t >= finalTime) {
-					if (this.fruits.get(i).transform.position.y - (slotMiddleY + fruitDistY) <= 30) {
-						//float dY = this.fruits.get(i).transform.position.y - slotMiddleY;
-						//this.aligned = true;
-						this.winningObject = i;
+					if (this.fruits.get(i).transform.position.y - (slotMiddleY + fruitDistY) <= 30) {						
+						this.winningObjectID = i;
 						
+						// erase other sprites
+						for (int j = 0; j < this.fruits.size(); j++) {
+							if (j != winningObjectID) {
+								GameObject go = this.fruits.get(j);
+								go.getComponent(SpriteRenderer.class).setColor(new Vector4f(0,0,0,0));
+							}
+						}
 						
-						//System.out.println(SlotMachine.getName(winningObject));
-						this.done = true;
+						// center winning sprite
+						this.fruits.get(winningObjectID).transform.position.y = slotMiddleY + 1.5f*fruitDistY;
+						
+						//System.out.println(SlotMachine.getName(winningObjectID));
+						for (int k = 0; k <= 1; k++) {
+							GameObject dup = Prefabs.generateSpriteObject(this.sprites.getSprite(winningObjectID), 100, 100);
+							
+							if (k == 0) {
+								dup.setNoSerialize();
+								dup.transform.position.y = this.fruits.get(winningObjectID).transform.position.y + 1.45f*fruitDistY;
+								dup.transform.position.x = this.fruits.get(winningObjectID).transform.position.x;
+							}
+							if (k == 1) {
+								dup.setNoSerialize();
+								dup.transform.position.y = this.fruits.get(winningObjectID).transform.position.y - 1.2f*fruitDistY;
+								dup.transform.position.x = this.fruits.get(winningObjectID).transform.position.x;
+							}
+							
+							Window.getScene().addGameObjectToScene(dup);
+						}
+						
+						this.fruits.get(winningObjectID).transform.position.y += 10;
+						
 						this.slotRunning = false;
 						break;
 					}
@@ -119,10 +146,7 @@ public class Slot extends Component{
 					this.outOfBounds = false;
 				}
 			}
-		} else {
-			
-		}
-		//System.out.println("winning object: " + this.winningObject);
+		} 
 	}
 	
 	private void alignToCenter(float dt) {
@@ -132,12 +156,12 @@ public class Slot extends Component{
 		
 	
 	
-	public int getWinningObject() {
-		return this.winningObject;
+	public int getwinningObjectID() {
+		return this.winningObjectID;
 	}
 	
 	public boolean doneRunning() {
-		return this.done;
+		return !this.slotRunning;
 	}
 	
 	public float getTime() {

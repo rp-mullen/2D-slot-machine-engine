@@ -71,9 +71,6 @@ public class LevelEditorScene extends Scene {
     private void loadResources() {
         AssetPool.getShader("assets/shaders/default.glsl");
 
-        AssetPool.addSpritesheet("assets/images/spritesheets/decorationsAndBlocks.png",
-             new Spritesheet(AssetPool.getTexture("assets/images/spritesheets/decorationsAndBlocks.png"),
-                     16, 16, 81, 0));
         AssetPool.addSpritesheet("assets/images/spritesheets/gizmos.png",
                 new Spritesheet(AssetPool.getTexture("assets/images/spritesheets/gizmos.png"),
                         24, 48, 3, 0));
@@ -105,21 +102,7 @@ public class LevelEditorScene extends Scene {
     public void update(float dt) {
     	levelEditorStuff.update(dt);
     	this.camera.adjustProjection();
-    	
-    	DebugDraw.addCircle2D(new Vector2f(x,y), 64, new Vector3f(0,1,0), 1);
-    	x += 50 * dt;
-    	y += 50 * dt;
-    	
-    	DebugDraw.addBox2D(new Vector2f(200,200),  new Vector2f(64, 32), angle, new Vector3f(0,1,0), 1);
-    	angle += 50.0f * dt;
-    	/*
-    	float x = ((float)Math.sin(t) * 200.0f) + 600;
-    	float y = ((float)Math.cos(t) * 200.0f) + 400;
-    	t += 0.05f;
-    	
-    	DebugDraw.addLine2D(new Vector2f(600,400), new Vector2f(x,y), new Vector3f(0,0,1));
-    	*/
-    	
+   
     	for (GameObject go : this.gameObjects) {
             go.update(dt);
         }

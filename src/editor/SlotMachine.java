@@ -6,23 +6,28 @@ import java.util.List;
 
 import components.Component;
 import components.Spritesheet;
+import engine.KeyListener;
+import imgui.ImGui;
+
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
+
 
 public class SlotMachine extends Component {
 	
 	private List<Slot> slots;
-	private List<Integer> results;
+	private List<Float> times;
 	
 	private static HashMap<Integer,String> valNames = new HashMap<>();
 	
 	private float t = 0.0f;
-	private float totalTime = 0.0f;
-	private boolean running = true;
+	private float finalTime;
 	
-	private boolean reportResult = false;
-	private int resultCount = 0;
+	private boolean running = false;
+	
 	
 	public SlotMachine(Spritesheet sprites) {
 		
+		// map slot object indices to their sprite names
 		valNames.put(0, "Cherry");
 		valNames.put(1, "Strawberry");
 		valNames.put(2, "Lemon");
@@ -33,35 +38,70 @@ public class SlotMachine extends Component {
 		valNames.put(7, "Watermelon");
 		valNames.put(8,"Seven");
 		
-		results = new ArrayList<>();
 		slots = new ArrayList<>();
+		times = new ArrayList<>();
+		
 		for (int i = 0; i < 5; i++) {
 			slots.add(new Slot(sprites, i));
-			this.totalTime += slots.get(i).getTime();
+			times.add(slots.get(i).getTime());
+			}
+		
+		// let it run just a little longer than the longest running slot
+		for (int j = 1; j < times.size(); j++) {
+			finalTime = Math.max(times.get(j), times.get(j-1));
 		}
+		finalTime++;
 	}
 	
 	@Override
 	public void update(float dt) {
-		t += dt;
-		if (t < slots.get(slots.size()-1).getTime()) {
+		
+		// SPACE to start the slots
+		if (KeyListener.isKeyPressed(GLFW_KEY_SPACE) && !this.running) {
+			this.running = true;
+		}
+		
+		// run each slot
+		if (t <= finalTime && this.running) {
+			t += dt;
 			for (Slot slot : slots) {
 				slot.update(dt);
 			}
-		} else {
-			this.reportResult = true;
-		}
-		
-		if (this.reportResult && this.resultCount < 1) {
+		} 
+		// calculate and print results
+		else if (t > finalTime && this.running) {
+			System.out.println("Done!\n");
+			System.out.println("     Results     ");
+			System.out.println("==================");
+			
 			for (Slot slot : this.slots) {
-				System.out.println(SlotMachine.getName(slot.getWinningObject()));
+				String name = SlotMachine.getName(slot.getwinningObjectID());
+				System.out.println(" * " + name);
 			}
-			this.reportResult = false;
-			this.resultCount++;
+			
+			System.out.println("");
+			
+			if (isJackpot()) {
+				System.out.println("Jackpot!");
+			} else {
+				System.out.println("No Jackpot -- Better luck next time.");
+			}
+			
+			this.running = false;
 		}
 	}
 	
 	public static String getName(int x) {
 		return valNames.get(x);
+	}
+	
+	public boolean isJackpot() {
+		int ID = slots.get(0).getwinningObjectID();
+		for (int i = 1; i < slots.size(); i++) {
+			if (slots.get(i).getwinningObjectID() != ID) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
