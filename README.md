@@ -7,7 +7,13 @@ and an editor with ImGui windowing for showing and editing object properties.
 ## Sample Output
 
 <p align="center">
-  <img src="https://github.com/rp-mullen/quantum-image-evolver/blob/main/output.gif"/>
+  <img src="https://github.com/rp-mullen/java-2D-game-engine/blob/main/output/slot_output.gif"/>
+</p>
+
+### Terminal Output
+
+<p align="center">
+  <img src="https://github.com/rp-mullen/java-2D-game-engine/blob/main/output/slot_output.gif"/>
 </p>
 
 
