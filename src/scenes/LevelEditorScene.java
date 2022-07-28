@@ -13,6 +13,9 @@ import components.Sprite;
 import components.SpriteRenderer;
 import components.Spritesheet;
 import components.TranslateGizmo;
+import editor.GameBackground;
+import editor.Slot;
+import editor.SlotMachine;
 import engine.Camera;
 import engine.GameObject;
 import engine.MouseListener;
@@ -34,7 +37,7 @@ public class LevelEditorScene extends Scene {
 
     private GameObject obj1;
     private Spritesheet sprites;
-    SpriteRenderer obj1Sprite;
+    private Sprite slotSprite;
     
     GameObject levelEditorStuff = this.createGameObject("LevelEditor");
     
@@ -48,14 +51,18 @@ public class LevelEditorScene extends Scene {
     public void init() {
     	
     	loadResources();
-    	sprites = AssetPool.getSpritesheet("assets/images/spritesheets/decorationsAndBlocks.png");
+    	sprites = AssetPool.getSpritesheet("assets/images/spritesheets/slotMachineSPrites.png");
     	Spritesheet gizmos = AssetPool.getSpritesheet("assets/images/spritesheets/gizmos.png");
     	
-    	this.camera = new Camera(new Vector2f(-250, 0));
+    	Sprite BGSprite = new Sprite();
+    	BGSprite.setTexture(AssetPool.getTexture("assets/images/casinoGameBg.jpg"));
+    	
+    	this.camera = new Camera(new Vector2f(0, 0));
     	levelEditorStuff.addComponent(new MouseControls());
     	levelEditorStuff.addComponent(new GridLines());
     	levelEditorStuff.addComponent(new EditorCamera(this.camera));
-    	
+    	levelEditorStuff.addComponent(new GameBackground(BGSprite));
+    	levelEditorStuff.addComponent(new SlotMachine(sprites));
     	levelEditorStuff.addComponent(new GizmoSystem(gizmos));
     	
     	levelEditorStuff.start();
@@ -65,13 +72,18 @@ public class LevelEditorScene extends Scene {
         AssetPool.getShader("assets/shaders/default.glsl");
 
         AssetPool.addSpritesheet("assets/images/spritesheets/decorationsAndBlocks.png",
-                new Spritesheet(AssetPool.getTexture("assets/images/spritesheets/decorationsAndBlocks.png"),
-                        16, 16, 81, 0));
+             new Spritesheet(AssetPool.getTexture("assets/images/spritesheets/decorationsAndBlocks.png"),
+                     16, 16, 81, 0));
         AssetPool.addSpritesheet("assets/images/spritesheets/gizmos.png",
                 new Spritesheet(AssetPool.getTexture("assets/images/spritesheets/gizmos.png"),
                         24, 48, 3, 0));
-        AssetPool.getTexture("assets/images/blendImage2.png");
-
+        
+        AssetPool.getTexture("assets/images/casinoGameBg.jpg");
+        
+        AssetPool.addSpritesheet("assets/images/spritesheets/slotMachineSPrites.png",
+        		new Spritesheet(AssetPool.getTexture("assets/images/spritesheets/slotMachineSprites.png"),
+        				200,200,9,0));
+        
         for (GameObject g : gameObjects) {
             if (g.getComponent(SpriteRenderer.class) != null) {
                 SpriteRenderer spr = g.getComponent(SpriteRenderer.class);

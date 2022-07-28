@@ -7,7 +7,7 @@
         "type": "engine.Transform",
         "properties": {
           "position": {
-            "x": 186.44308,
+            "x": 340.50293,
             "y": 288.0
           },
           "scale": {
@@ -69,8 +69,8 @@
         "type": "engine.Transform",
         "properties": {
           "position": {
-            "x": 294.216,
-            "y": 390.82162
+            "x": 332.53955,
+            "y": 359.9177
           },
           "scale": {
             "x": 35.0,
@@ -132,7 +132,7 @@
         "properties": {
           "position": {
             "x": 394.73053,
-            "y": 0.0
+            "y": 193.79355
           },
           "scale": {
             "x": 32.0,
@@ -255,7 +255,7 @@
         "type": "engine.Transform",
         "properties": {
           "position": {
-            "x": 421.94022,
+            "x": 541.34845,
             "y": 288.0
           },
           "scale": {
@@ -379,7 +379,7 @@
         "type": "engine.Transform",
         "properties": {
           "position": {
-            "x": 466.58685,
+            "x": 163.8324,
             "y": 447.6704
           },
           "scale": {
@@ -441,14 +441,14 @@
         "type": "engine.Transform",
         "properties": {
           "position": {
-            "x": 416.0,
-            "y": 256.0
+            "x": 708.0237,
+            "y": 355.15015
           },
           "scale": {
-            "x": 32.0,
-            "y": 32.0
+            "x": 58.5,
+            "y": 47.9
           },
-          "rotation": 0.0,
+          "rotation": -46.8,
           "zIndex": 0,
           "uid": 33
         }
@@ -457,9 +457,9 @@
         "type": "components.SpriteRenderer",
         "properties": {
           "color": {
-            "x": 1.0,
-            "y": 1.0,
-            "z": 1.0,
+            "x": 0.6940063,
+            "y": 0.5166735,
+            "z": 0.5166735,
             "w": 1.0
           },
           "sprite": {
@@ -565,7 +565,7 @@
         "type": "engine.Transform",
         "properties": {
           "position": {
-            "x": 575.9998,
+            "x": 655.71246,
             "y": 493.90393
           },
           "scale": {
