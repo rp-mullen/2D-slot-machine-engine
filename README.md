@@ -13,7 +13,7 @@ and an editor with ImGui windowing for showing and editing object properties.
 ### Terminal Output
 
 <p align="center">
-  <img src="https://github.com/rp-mullen/java-2D-game-engine/blob/main/output/slot_output.gif"/>
+  <img src="https://github.com/rp-mullen/java-2D-game-engine/blob/main/output/console_output.png"/>
 </p>
 
 
