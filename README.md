@@ -18,4 +18,5 @@ and an editor with ImGui windowing for showing and editing object properties.
 
 ##  // TODO 
 * Implement font rendering to print the output of the slot machine to the screen
+* Implement a currency system
 * Generate statistical analysis of the slot output for a large number of runs
